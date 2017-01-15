@@ -1,9 +1,10 @@
 GOOGLE_API_KEY = 'AIzaSyCMgw5bWf-ZIGIsUYcFgK8v5_4uQeJUTzE';
+var mapMarkers = [];
+var paths = [];
 
 $(document).ready(function() {
 	var map = L.map('map').setView([33.448376, -112.074036], 13);
-	var mapMarkers = [];
-
+	$('#map_right_col').hide();
 	breakfastIcon = L.icon({
     iconUrl: '/static/img/breakfast.png',
 
@@ -69,7 +70,16 @@ $(document).ready(function() {
 		mapMarkers.forEach(function(marker) {
 			map.removeLayer(marker);
 		});
+		paths.forEach(function(path) {
+			map.removeLayer(path);
+		});
 		mapMarkers = [];
+		paths = [];
+		$('#list-group').html('');
+		$('#map_left_col').removeClass('col-md-9');
+		$('#map_right_col').hide();
+		map._onResize();
+
 		var terms = $('#terms').val()
 
 		submitButton.attr("disabled", true);
@@ -133,9 +143,11 @@ $(document).ready(function() {
 						var curr = schedule[i];
 
 						var polyline = createPath(map, prev.latitude, prev.longitude, curr.latitude, curr.longitude);
-						mapMarkers.push(polyline);
+						paths.push(polyline);
 					}
 				}
+				$('#map_left_col').addClass('col-md-9');
+				$('#map_right_col').show();
 
 				scrollToMap();
 				var group = new L.featureGroup(mapMarkers);
@@ -175,8 +187,49 @@ function addMarker(map, activity, icon){
 	}
 	popupHTML += '</div>';
 
+	addListElement(activity);
 	marker.bindPopup(popupHTML);
+
+	marker.index = mapMarkers.length;
+	marker.on('click', function(event) {
+		var enclosingListGroup = $('#list-group');
+		resetListColoring(enclosingListGroup);
+		enclosingListGroup.children().eq(this.index).addClass('active');
+		console.log(this.index);
+	});
+
 	return marker;
+}
+
+function addListElement(activity) {
+	console.log("addListElement called.");
+	var enclosingListGroup = $('#list-group');
+	var numElements = enclosingListGroup.children().length;
+
+	var listElement = document.createElement("li");
+	listElement.setAttribute("class", "list-group-item");
+	listElement.setAttribute("count", numElements);
+
+	/*if(numElements == 0 || numElements == 3 || numElements == 6) {
+		listElement.setAttribute("class", "purple-border");
+	} else {
+		listElement.setAttribute("class", "green-border");
+	}*/
+
+	listElement.innerHTML = "<h5>" + (numElements + 1) + ". " + activity.name + "</h5>";
+
+	listElement.addEventListener('click', function() {
+		resetListColoring(enclosingListGroup);
+		var index = parseInt(listElement.getAttribute('count'));
+		enclosingListGroup.children().eq(index).addClass("active");
+		mapMarkers[index].openPopup();
+	});
+
+	enclosingListGroup.append(listElement);
+}
+
+function resetListColoring(enclosingListGroup){
+	enclosingListGroup.children().removeClass("active");
 }
 
 function createPath(map, lat1, long1, lat2, long2){
@@ -186,7 +239,7 @@ function createPath(map, lat1, long1, lat2, long2){
 	return polyline;
 }
 
-function appendArray( mainArray,  arrayToAdd) {
+function appendArray(mainArray,  arrayToAdd) {
 	for (var i = 0 ; i < arrayToAdd.length; i++) {
 		mainArray.push(arrayToAdd[i]);
 	}

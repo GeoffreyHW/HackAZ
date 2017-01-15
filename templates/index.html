@@ -9,6 +9,7 @@
     <meta name="author" content="">
 
     <title>Take Off</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/png">
 
     <!-- Bootstrap Core CSS -->
     <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -68,6 +69,23 @@
       .tech-list li{
         padding-bottom: 5px;
       }
+      .selected {
+        background-color: gray;
+      }
+      .unselected {
+        background-color: white;
+      }
+      .nopadding {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .minpadding {
+        padding-left: 10px !important;
+        padding-right: 20px !important;
+      }
+      #list-group li {
+        cursor: pointer;
+      }
     </style>
 
 </head>
@@ -108,6 +126,7 @@
                 <h1 id="homeHeading">Find The Activities That Suit You Best</h1>
                 <hr>
                 <p>A website that uses <b>genetic algorithms</b> to create a day-long vacation schedule tailored to your own interests.</p>
+                <a href="#about" class="btn btn-primary btn-xl page-scroll">Find Out More</a>
             </div>
         </div>
     </header>
@@ -148,8 +167,19 @@
         </div>
     </section>
     <section id="map_section">
-        <div id="map"></div>
-    </section>
+      <div class="row">
+        <div id="map_left_col" class="nopadding">
+          <div id="map"></div>
+        </div>
+        <div id="map_right_col" class="col-md-3 nopadding">
+          <div class="text-center">
+            <h2>Your Schedule</h2>
+          </div>
+          <ul id="list-group" class="minpadding">
+          </ul>
+        </div>
+      </div>
+   </section>
     <section id="code">
         <div class="container">
             <div class="row">
